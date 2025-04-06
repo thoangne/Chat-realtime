@@ -1,10 +1,11 @@
-import User from "../models/user.model";
-import Message from "../models/message.model";
+import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudnary.js";
+import { getReceiverSockerId, io } from "../lib/socket.js";
 
 export const getUserForSidebar = async (req, res) => {
   try {
-    const loggedInUserId = req.user_id;
+    const loggedInUserId = req.user._id;
 
     if (!loggedInUserId) {
       return res.status(400).json({ message: "User ID is required" });
@@ -24,8 +25,8 @@ export const getUserForSidebar = async (req, res) => {
 export const getMessage = async (req, res) => {
   try {
     const { id: userToChatId } = req.params;
-    const myId = req.user_id;
-
+    const myId = req.user._id;
+    console.log("my id", myId);
     if (!myId || !userToChatId) {
       return res.status(400).json({ message: "Both user IDs are required" });
     }
@@ -48,25 +49,42 @@ export const sendMessage = async (req, res) => {
   try {
     const { text, image } = req.body;
     const { id: receiverId } = req.params;
-    const senderId = req.user_id;
+    const senderId = req.user._id;
+
+    if (!text && !image) {
+      return res
+        .status(400)
+        .json({ message: "Message text or image is required" });
+    }
+
     let imageUrl;
     if (image) {
       const uploadRespone = await cloudinary.uploader.upload(image);
       imageUrl = uploadRespone.secure_url;
     }
 
+    // Tạo tin nhắn mới
     const newMessage = new Message({
       senderId,
       receiverId,
       text,
       image: imageUrl,
     });
+
+    // Lưu tin nhắn vào cơ sở dữ liệu
     await newMessage.save();
 
-    //todo realtime functionly
+    // Lấy socketId của người nhận
+    const receiverSocketId = getReceiverSockerId(receiverId);
+    if (receiverSocketId) {
+      // Phát tín hiệu "newMessage" đến client người nhận
+      io.to(receiverSocketId).emit("newMessage", newMessage);
+    }
+
+    // Trả về tin nhắn vừa gửi
     res.status(200).json({ newMessage });
   } catch (error) {
     console.log("Error in sendMessage controller", error.message);
-    res.status(500).json({ error });
+    res.status(500).json({ error: error.message });
   }
 };
