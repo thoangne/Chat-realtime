@@ -38,11 +38,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                src={
-                  selectedImage ||
-                  authUser?.user.profilePicture ||
-                  "/avatar.png"
-                }
+                src={selectedImage || authUser.profilePicture || "/avatar.png"}
                 alt="Profile"
                 className="size-32 rounded-full object-cover border-4"
               />
@@ -77,7 +73,7 @@ const ProfilePage = () => {
                 <User className="w-4 h-4" /> Full Name
               </div>
               <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {authUser?.user.fullname || "N/A"}
+                {authUser.fullname || "N/A"}
               </p>
             </div>
 
@@ -86,7 +82,7 @@ const ProfilePage = () => {
                 <Mail className="w-4 h-4" /> Email Address
               </div>
               <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                {authUser?.user.email || "N/A"}
+                {authUser.email || "N/A"}
               </p>
             </div>
           </div>
@@ -97,7 +93,7 @@ const ProfilePage = () => {
             <div className="space-y-3 text-sm">
               <div className="flex items-center justify-between py-2 border-b border-zinc-700">
                 <span>Member Since</span>
-                <span>{authUser?.user.createdAt?.split("T")[0] || "N/A"}</span>
+                <span>{authUser.createdAt?.split("T")[0] || "N/A"}</span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span>Account Status</span>

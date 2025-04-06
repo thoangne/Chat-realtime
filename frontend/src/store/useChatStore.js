@@ -112,7 +112,6 @@ export const useChatStore = create((set, get) => ({
       console.warn("⚠️ Socket chưa được khởi tạo.");
     }
   },
-
   // ✅ Chọn người để chat
   setSelectedUser: (selectedUser) => {
     console.log("👤 Đã chọn người dùng:", selectedUser);

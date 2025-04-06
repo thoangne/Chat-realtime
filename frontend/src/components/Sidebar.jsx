@@ -6,6 +6,7 @@ import { useAuthStore } from "../store/useAuthStore";
 const Sidebar = () => {
   const { getUsers, users, selectedUser, setSelectedUser, isUserLoading } =
     useChatStore();
+  //state track message
 
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const { onlineUsers } = useAuthStore();
