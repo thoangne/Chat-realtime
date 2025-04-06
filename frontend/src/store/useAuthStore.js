@@ -2,10 +2,8 @@ import { create } from "zustand";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
-const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5000/api"
-    : "https://chatty-tgbr.onrender.com/api";
+const BASE_URL = "http://localhost:5000";
+// : "https://chatty-tgbr.onrender.com";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -19,14 +17,15 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/auth/check");
-      set({ authUser: response.data, isCheckingAuth: false });
-      console.log("checkAuth", response.data);
-      get().connectSocket();
+      if (response.data && response.data._id) {
+        set({ authUser: response.data, isCheckingAuth: false });
+        get().connectSocket();
+      } else {
+        set({ authUser: null, isCheckingAuth: false });
+      }
     } catch (error) {
       console.error("Error checking auth:", error);
-      set({ authUser: false });
-    } finally {
-      set({ isCheckingAuth: false });
+      set({ authUser: null, isCheckingAuth: false });
     }
   },
   signUp: async (userData) => {
@@ -46,7 +45,7 @@ export const useAuthStore = create((set, get) => ({
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
       toast.success("Logged out successfully!");
-      get().disconnectSocket();
+      await get().disconnectSocket();
     } catch (error) {
       toast.error(error);
     }
@@ -58,7 +57,14 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: response.data });
       toast.success("Logged in successfully!");
 
-      get().connectSocket();
+      // Kiểm tra xem authUser có tồn tại và có thông tin _id không
+      const { authUser } = get();
+      console.log("autheUser", authUser);
+      if (authUser || authUser.user || authUser.user._id) {
+        get().connectSocket(); // Chỉ kết nối socket khi authUser đã hợp lệ
+      } else {
+        console.error("Invalid authUser data:", authUser);
+      }
     } catch (error) {
       console.error("Error logging in:", error);
       toast.error("Login failed");
@@ -86,19 +92,23 @@ export const useAuthStore = create((set, get) => ({
   connectSocket: () => {
     const { authUser } = get();
 
-    const newSocket = io(BASE_URL, {
-      query: {
-        userId: authUser.user._id,
-      },
-    });
-    newSocket.connect();
-    set({ socket: newSocket });
-    newSocket.on("getOnlineUsers", (userId) => {
-      set({ onlineUsers: userId });
-    });
+    // Kiểm tra xem authUser có hợp lệ và có trường _id không
+    if (authUser && authUser._id) {
+      const newSocket = io(BASE_URL, {
+        query: {
+          userId: authUser._id, // Sử dụng _id của authUser
+        },
+      });
+      newSocket.connect();
+      set({ socket: newSocket });
+      newSocket.on("getOnlineUsers", (userId) => {
+        set({ onlineUsers: userId });
+      });
+    } else {
+      console.error("authUser is invalid or does not have _id:", authUser);
+    }
   },
-
-  disconnectSocket: () => {
+  disconnectSocket: async () => {
     const { socket } = get();
     if (socket) {
       socket.disconnect(); // Ngắt kết nối socket

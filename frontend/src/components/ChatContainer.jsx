@@ -15,6 +15,7 @@ const ChatContainer = () => {
     unsubscribeFromMessages,
   } = useChatStore();
   const { authUser } = useAuthStore();
+  console.log("autheuser", authUser);
   const messagesEndRef = useRef(null);
   useEffect(() => {
     if (selectedUser?._id) {
@@ -54,7 +55,7 @@ const ChatContainer = () => {
           <div
             key={msg._id}
             className={`chat ${
-              msg.senderId === authUser.user._id ? "chat-end" : "chat-start"
+              msg.senderId === authUser._id ? "chat-end" : "chat-start"
             }`}
             ref={messagesEndRef}
           >
@@ -62,8 +63,8 @@ const ChatContainer = () => {
               <div className="size-10 rounded-full border">
                 <img
                   src={
-                    msg.senderId === authUser.user._id
-                      ? authUser.user.profilePicture || "avatar.png"
+                    msg.senderId === authUser._id
+                      ? authUser.profilePicture || "avatar.png"
                       : selectedUser.profilePicture || "avatar.png"
                   }
                   alt="profile pic"

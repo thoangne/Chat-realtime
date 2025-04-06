@@ -17,14 +17,10 @@ app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin:
-      process.env.NODE_ENV === "development"
-        ? "https://chatty-tgbr.onrender.com"
-        : "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://chatty-tgbr.onrender.com"], // Thêm cả URL của frontend khi deploy lên
     credentials: true,
   })
 );
-
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 

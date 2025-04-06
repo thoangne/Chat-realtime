@@ -14,7 +14,10 @@ export function getReceiverSockerId(userId) {
 // Socket.io configuration
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173", // Phát triển local
+      "https://chatty-tgbr.onrender.com", // URL của frontend khi deploy lên Render
+    ],
     credentials: true,
   },
 });
