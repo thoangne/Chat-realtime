@@ -51,44 +51,49 @@ const ChatContainer = () => {
       {/* full height */}
       <ChatHeader />
       <div className="h-[500px] overflow-y-auto p-4 space-y-4 scroll-smooth scrollbar-thin scrollbar-thumb-gray-400">
-        {messages.map((msg) => (
-          <div
-            key={msg._id}
-            className={`chat ${
-              msg.senderId === authUser._id ? "chat-end" : "chat-start"
-            }`}
-            ref={messagesEndRef}
-          >
-            <div className="chat-image avatar">
-              <div className="size-10 rounded-full border">
-                <img
-                  src={
-                    msg.senderId === authUser._id
-                      ? authUser.profilePicture || "avatar.png"
-                      : selectedUser.profilePicture || "avatar.png"
-                  }
-                  alt="profile pic"
-                />
+        {Array.isArray(messages) && messages.length > 0 ? (
+          messages.map((msg) => (
+            <div
+              key={msg._id}
+              className={`chat ${
+                msg.senderId === authUser._id ? "chat-end" : "chat-start"
+              }`}
+              ref={messagesEndRef}
+            >
+              <div className="chat-image avatar">
+                <div className="size-10 rounded-full border">
+                  <img
+                    src={
+                      msg.senderId === authUser._id
+                        ? authUser.profilePicture || "avatar.png"
+                        : selectedUser.profilePicture || "avatar.png"
+                    }
+                    alt="profile pic"
+                  />
+                </div>
+              </div>
+              <div className="chat-header mb-1">
+                <time dateTime="" className="text-xs opacity-50 ml-1">
+                  {formatMessageTime(msg.createdAt)}
+                </time>
+              </div>
+              <div className="chat-bubble flex">
+                {msg.image && (
+                  <img
+                    src={msg.image}
+                    alt="Attachment"
+                    className="sm:max-w-[200px] rounded-md mb-2"
+                  />
+                )}
+                {msg.text && <p>{msg.text}</p>}
               </div>
             </div>
-            <div className="chat-header mb-1">
-              <time dateTime="" className="text-xs opacity-50 ml-1">
-                {formatMessageTime(msg.createdAt)}
-              </time>
-            </div>
-            <div className="chat-bubble flex">
-              {msg.image && (
-                <img
-                  src={msg.image}
-                  alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
-                />
-              )}
-              {msg.text && <p>{msg.text}</p>}
-            </div>
-          </div>
-        ))}
+          ))
+        ) : (
+          <div>No messages available</div> // Có thể là một thông báo khi không có tin nhắn
+        )}
       </div>
+
       <MessageInput />
     </div>
   );
