@@ -2,8 +2,8 @@ import { create } from "zustand";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
-const BASE_URL = "http://localhost:5000";
-// : "https://chatty-tgbr.onrender.com";
+
+const BASE_URL = import.meta.env.BASE_URL;
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -94,6 +94,7 @@ export const useAuthStore = create((set, get) => ({
 
     // Kiểm tra xem authUser có hợp lệ và có trường _id không
     if (authUser && authUser._id) {
+      // eslint-disable-next-line no-undef
       const newSocket = io(BASE_URL, {
         query: {
           userId: authUser._id, // Sử dụng _id của authUser
