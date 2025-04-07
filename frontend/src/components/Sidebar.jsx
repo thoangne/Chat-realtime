@@ -3,20 +3,30 @@ import { useChatStore } from "../store/useChatStore";
 import SidebarSkeleton from "../components/skeletions/SidebarSkeleton";
 import { User } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-const Sidebar = () => {
-  const { getUsers, users, selectedUser, setSelectedUser, isUserLoading } =
-    useChatStore();
-  //state track message
 
+const Sidebar = () => {
+  const {
+    getUsers,
+    users = [],
+    selectedUser,
+    setSelectedUser,
+    isUserLoading,
+  } = useChatStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-  const { onlineUsers } = useAuthStore();
-  console.log(onlineUsers);
+  const { onlineUsers = [] } = useAuthStore();
+
   useEffect(() => {
     getUsers();
   }, [getUsers]);
-  const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
-    : users;
+
+  const filteredUsers = Array.isArray(users)
+    ? showOnlineOnly
+      ? users.filter(
+          (user) => Array.isArray(onlineUsers) && onlineUsers.includes(user._id)
+        )
+      : users
+    : [];
+
   if (isUserLoading) return <SidebarSkeleton />;
 
   return (
@@ -27,7 +37,8 @@ const Sidebar = () => {
           <span className="font-medium hidden lg:block">Contacts</span>
         </div>
       </div>
-      {/* TODO: Online filter toggle */}
+
+      {/* Toggle Show Online Only */}
       <div className="mt-3 hidden lg:flex items-center gap-2">
         <label className="pl-4 cursor-pointer flex items-center gap-2">
           <input
@@ -38,44 +49,42 @@ const Sidebar = () => {
           />
           <span className="text-sm">Show online only</span>
         </label>
-        <span className="text-xs [text-zinc-500">
-          ({onlineUsers.length - 1} online)
+        <span className="text-xs text-zinc-500">
+          ({Math.max(0, onlineUsers.length - 1)} online)
         </span>
       </div>
 
       <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.map((user) => (
-          <button
-            key={user._id}
-            onClick={() => setSelectedUser(user)}
-            className={`
-              w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors
+        {Array.isArray(filteredUsers) &&
+          filteredUsers.map((user) => (
+            <button
+              key={user._id}
+              onClick={() => setSelectedUser(user)}
+              className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors
               ${
                 selectedUser?._id === user._id
                   ? "bg-base-300 ring-1 ring-base-300"
                   : ""
-              }
-            `}
-          >
-            <div className="relative mx-auto lg:mx-0">
-              <img
-                src={user.profilePicture || "/avatar.png"}
-                alt={user.fullname}
-                className="size-12 object-cover rounded-full"
-              />
-              {onlineUsers.includes(user._id) && (
-                <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900"></span>
-              )}
-            </div>
-            {/* User info - only visible on larger screens */}
-            <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullname}</div>
-              <div className="text-sm text-zinc-400">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+              }`}
+            >
+              <div className="relative mx-auto lg:mx-0">
+                <img
+                  src={user.profilePicture || "/avatar.png"}
+                  alt={user.fullname}
+                  className="size-12 object-cover rounded-full"
+                />
+                {onlineUsers.includes(user._id) && (
+                  <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900"></span>
+                )}
               </div>
-            </div>
-          </button>
-        ))}
+              <div className="hidden lg:block text-left min-w-0">
+                <div className="font-medium truncate">{user.fullname}</div>
+                <div className="text-sm text-zinc-400">
+                  {onlineUsers.includes(user._id) ? "Online" : "Offline"}
+                </div>
+              </div>
+            </button>
+          ))}
       </div>
     </aside>
   );
