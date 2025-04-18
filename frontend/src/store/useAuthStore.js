@@ -32,10 +32,20 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const response = await axiosInstance.post("/auth/signup", userData);
+
       set({ authUser: response.data });
       toast.success("Account created successfully! Please log in.");
     } catch (error) {
       console.error("Error signing up:", error);
+      if (error.response?.status === 410) {
+        toast.error("Email already exists. Please use a different email.");
+      } else if (error?.response?.status === 409) {
+        toast.error("Password must be at least 8 characters long.");
+      } else if (error?.response?.status === 408) {
+        toast.error("Please fill all fields.");
+      } else {
+        toast.error("Sign up failed. Please try again.");
+      }
     } finally {
       set({ isSigningUp: false });
     }

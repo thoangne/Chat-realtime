@@ -11,18 +11,18 @@ export const signup = async (req, res) => {
   const { fullname, email, password } = req.body;
   try {
     if (!fullname || !email || !password) {
-      return res.status(400).json({ message: "Please fill all fields" });
+      return res.status(408).json({ message: "Please fill all fields" });
     }
 
     if (password.length < 8) {
       return res
-        .status(400)
+        .status(409)
         .json({ message: "Password must be at least 8 characters long" });
     }
 
     const user = await User.findOne({ email });
     if (user) {
-      return res.status(400).json({ message: "User already exists" });
+      return res.status(410).json({ message: "User already exists" });
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -40,6 +40,8 @@ export const signup = async (req, res) => {
         fullname: newUser.fullname,
         email: newUser.email,
         profilePicture: newUser.profilePicture,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
       });
     } else {
       return res.status(400).json({ message: "User not created" });

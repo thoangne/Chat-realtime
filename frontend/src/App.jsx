@@ -25,7 +25,7 @@ export default function App() {
     return <Loader className="w-10 h-10 animate-spin" />;
   }
   return (
-    <div data-theme="retro">
+    <div data-theme="">
       <Navbar />
       <Routes>
         <Route
