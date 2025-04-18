@@ -12,13 +12,15 @@ import { Toaster } from "react-hot-toast"; // Ensure react-hot-toast is installe
 import { Loader } from "lucide-react"; // Ensure lucide-react is installed and imported correctly
 import { useThemeStore } from "./store/useThemeStore";
 export default function App() {
-  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
   const { theme } = useThemeStore();
-  console.log(onlineUsers);
   useEffect(() => {
-    checkAuth();
+    checkAuth(); // chỉ chạy 1 lần khi App khởi động
+  }, []);
+
+  useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
-  }, [theme, checkAuth]);
+  }, [theme]);
   if (isCheckingAuth && !authUser) {
     return <Loader className="w-10 h-10 animate-spin" />;
   }
