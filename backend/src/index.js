@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "*", // Thêm cả URL của frontend khi deploy lên
+    origin: ["http://localhost:5173", "https://chatty-tgbr.onrender.com"],
     credentials: true,
   })
 );
