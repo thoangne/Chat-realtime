@@ -37,6 +37,6 @@
     "terser": "^5.39.0",
     "terser-brunch": "^4.1.0",
     "uglifyify": "^5.0.2",
-    "vite": "^6.2.0"
+    "vite": "^6.3.2"
   }
 }

@@ -17,7 +17,7 @@ app.use(express.urlencoded({ extended: true, limit: "5mb" }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CORS_URL, // Thêm cả URL của frontend khi deploy lên
+    origin: "*", // Thêm cả URL của frontend khi deploy lên
     credentials: true,
   })
 );
