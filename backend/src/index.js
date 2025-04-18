@@ -21,15 +21,17 @@ app.use(
     credentials: true,
   })
 );
+app.use("/api/auth", authRoutes);
+app.use("/api/messages", messageRoutes);
 if (process.env.NODE_ENV === "production") {
+  console.log("Production mode", process.env.NODE_ENV);
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
 
   app.get("*", (req, res) => {
     res.sendFile(path.join(__dirname, "../frontend", "dist", "index.html"));
   });
 }
-app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+console.log("Production mode", process.env.NODE_ENV);
 
 server.listen(PORT, () => {
   console.log("Server is running on port", PORT);
