@@ -47,13 +47,13 @@ export const signup = async (req, res) => {
       return res.status(400).json({ message: "User not created" });
     }
   } catch (error) {
-    console.error(error);
     return res.status(500).json({ message: "Server error" });
   }
 };
 
 // Login
 export const login = async (req, res) => {
+  console.log("Login request body:", req.body); // Log the request body
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
@@ -74,7 +74,6 @@ export const login = async (req, res) => {
       profilePicture: user.profilePicture,
     });
   } catch (error) {
-    console.log("Error in login controller", error.message);
     res.status(500).json({ message: "Login error" });
   }
 };
@@ -85,7 +84,6 @@ export const logout = (req, res) => {
     res.cookie("jwt", "", { maxAge: 0 });
     res.status(200).json({ message: "Logged out successfully" });
   } catch (error) {
-    console.log("Error in logout controller", error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -119,17 +117,14 @@ export const checkAuth = async (req, res) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Dùng decoded.id thay vì decoded.userId
     const user = await User.findById(decoded.id).select("-password");
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    res.status(200).json({ message: "Authenticated", user });
+    res.status(200).json(user); // Trả về user trực tiếp
   } catch (error) {
-    console.error("Error in checkAuth controller:", error.message);
     res.status(500).json({ message: "Authentication error" });
   }
 };

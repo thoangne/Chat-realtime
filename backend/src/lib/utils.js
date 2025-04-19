@@ -4,14 +4,14 @@ dotenv.config();
 
 export const generateToken = (user, res) => {
   const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-    expiresIn: "1d",
+    expiresIn: "1h",
   });
 
   res.cookie("jwt", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV !== "production",
-    maxAge: 24 * 60 * 60 * 1000, // 1 day
-    sameSite: "strict",
+    secure: process.env.NODE_ENV === "production", // Chỉ secure trong production (HTTPS)
+    maxAge: 60 * 60 * 1000, // 1 giờ
+    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax", // Linh hoạt trong development
   });
 
   return token;
